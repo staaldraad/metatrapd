@@ -1,0 +1,57 @@
+name: Create Release
+
+on: 
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: SetupGO
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          cache: false
+      - name: Build
+        run: |
+          make release
+      - name: Install minisign
+        env:
+          MINISIGN_VERSION: 0.11
+          MINISIGN_CHECKSUM: '9f1adb1db8e70def95f4ace883ab2f8c0484df561d80daa9d008776d487e9b34'
+        run: |
+          curl -L -O https://github.com/jedisct1/minisign/releases/download/$MINISIGN_VERSION/minisign-$MINISIGN_VERSION-linux.tar.gz
+          tar -xzf minisign-$MINISIGN_VERSION-linux.tar.gz minisign-linux/x86_64/minisign
+          # verify
+          echo "$MINISIGN_CHECKSUM  minisign-linux/x86_64/minisign" | shasum -a 256 --check --status
+      - name: Sign Artifacts
+        env:
+          MINISIGN_KEY: {{ secrets.MINISIGN_KEY }}
+          MINISIGN_PASSWORD: {{ secrets.MINISIGN_PASSWORD }}
+        run: |
+          TMPFILE_KEY=$(mktemp)
+          TMPFILE_PASSWORD=$(mktemp)
+          echo "$MINISIGN_KEY" > "${TMPFILE_KEY}"
+          echo "$MINISIGN_PASSWORD" > "${TMPFILE_PASSWORD}"
+          # sign files
+          minisign -S -s "${TMPFILE_KEY}" -t "{{ github.ref_name }}" -m bin/metatrapd-x86 < "${TMPFILE_PASSWORD}"
+          minisign -S -s "${TMPFILE_KEY}" -t "{{ github.ref_name }}" -m bin/metatrapd-x64 < "${TMPFILE_PASSWORD}"
+
+          # display signatures here
+          cat bin/metatrapd-x86.minisig
+          cat bin/metatrapd-x64.minisig
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            bin/metatrapd-x86
+            bin/metatrapd-x86.minisig
+            bin/metatrapd-x64
+            bin/metatrapd-x64.minisig
