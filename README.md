@@ -32,8 +32,9 @@ Pre-compiled binaries can be verified with the following public key
 ([minisign](https://jedisct1.github.io/minisign/)):
 
 ```
-RWTMjjmmeUo5NLwwDZY2S+tKUKb+hXKuvDp6CLf7Hc/Tl9uIGxjUll+g 
+RWSQ5/CL7LMQ/YUj1KZqk4n7fMnftqJjNw3adtN3oNhEmn9HgiGEunvG
 ```
+
 ## Configuration
 
 _It is recommended to run metatrapd as a stand-alone, low privileged user._
