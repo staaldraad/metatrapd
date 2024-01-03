@@ -33,8 +33,8 @@ jobs:
           echo "$MINISIGN_CHECKSUM  minisign-linux/x86_64/minisign" | shasum -a 256 --check --status
       - name: Sign Artifacts
         env:
-          MINISIGN_KEY: {{ secrets.MINISIGN_KEY }}
-          MINISIGN_PASSWORD: {{ secrets.MINISIGN_PASSWORD }}
+          MINISIGN_KEY: ${{ secrets.MINISIGN_KEY }}
+          MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
         run: |
           TMPFILE_KEY=$(mktemp)
           TMPFILE_PASSWORD=$(mktemp)
