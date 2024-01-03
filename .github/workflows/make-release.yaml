@@ -43,11 +43,15 @@ jobs:
           # sign files
           minisign -S -s "${TMPFILE_KEY}" -t "{{ github.ref_name }}" -m bin/metatrapd-x86 < "${TMPFILE_PASSWORD}"
           minisign -S -s "${TMPFILE_KEY}" -t "{{ github.ref_name }}" -m bin/metatrapd-x64 < "${TMPFILE_PASSWORD}"
+
+          # display signatures here
+          cat bin/metatrapd-x86.minisig
+          cat bin/metatrapd-x64.minisig
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             bin/metatrapd-x86
-            bin/metatrapd-x86.minisign
+            bin/metatrapd-x86.minisig
             bin/metatrapd-x64
-            bin/metatrapd-x64.minisign
+            bin/metatrapd-x64.minisig
