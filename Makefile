@@ -18,4 +18,6 @@ release:  ## Build for all ARCH
 	GOOS=linux GOARCH=386 $(GO) build -o bin/metatrapd-x86 cmd/metatrapd/main.go
 	# 64-bit
 	GOOS=linux GOARCH=amd64 $(GO) build -o bin/metatrapd-x64 cmd/metatrapd/main.go
+	# arm64
+	GOOS=linux GOARCH=arm64 $(GO) build -o bin/metatrapd-arm64 cmd/metatrapd/main.go
 	sha256sum bin/metatrapd-*  > bin/SHA256SUMS

@@ -13,19 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: SetupGO
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.21'
+          go-version: '1.25'
           cache: false
       - name: Build
         run: |
           make release
       - name: Install minisign
         env:
-          MINISIGN_VERSION: 0.11
-          MINISIGN_CHECKSUM: '9f1adb1db8e70def95f4ace883ab2f8c0484df561d80daa9d008776d487e9b34'
+          MINISIGN_VERSION: 0.12
+          MINISIGN_CHECKSUM: '2c74dffcc1c9a5ee55957c60971998ace2b89f22585631594ec2152c588af8db'
         run: |
           curl -L -O https://github.com/jedisct1/minisign/releases/download/$MINISIGN_VERSION/minisign-$MINISIGN_VERSION-linux.tar.gz
           tar -xzf minisign-$MINISIGN_VERSION-linux.tar.gz minisign-linux/x86_64/minisign
@@ -44,15 +44,19 @@ jobs:
           # sign files
           minisign-linux/x86_64/minisign -S -s "${TMPFILE_KEY}" -t "${RELEASE_TAG}" -m bin/metatrapd-x86 < "${TMPFILE_PASSWORD}"
           minisign-linux/x86_64/minisign -S -s "${TMPFILE_KEY}" -t "${RELEASE_TAG}" -m bin/metatrapd-x64 < "${TMPFILE_PASSWORD}"
+          minisign-linux/x86_64/minisign -S -s "${TMPFILE_KEY}" -t "${RELEASE_TAG}" -m bin/metatrapd-arm64 < "${TMPFILE_PASSWORD}"
 
           # display signatures here
           cat bin/metatrapd-x86.minisig
           cat bin/metatrapd-x64.minisig
+          cat bin/metatrapd-arm64.minisig
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             bin/metatrapd-x86
             bin/metatrapd-x86.minisig
             bin/metatrapd-x64
             bin/metatrapd-x64.minisig
+            bin/metatrapd-arm64
+            bin/metatrapd-arm64.minisig
